@@ -62,3 +62,4 @@ def compute_response_point(response, is_positive):
     return point
 
         
+main()
