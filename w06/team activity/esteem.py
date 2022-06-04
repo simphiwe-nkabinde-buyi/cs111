@@ -1,16 +1,19 @@
 
 
 def main():
+    #print intro message
     intro = "This program is an implementation of the Rosenberg"
     intro += "\nSelf-Esteem Scale. This program will show you ten"
     intro += "\nstatements that you could possibly apply to yourself.\n"
-
     print(intro)
+
+    #meaning of response options
     print(f"D means you strongly disagree with the statement.")
     print(f"d means you disagree with the statement.")
     print(f"a means you agree with the statement.")
     print(f"A means you strongly agree with the statement")
 
+    #print statments and store score for each response in a list
     score_list = [
         get_statement_response_score("1. I feel that I am a person of worth, at least on an equal plane with others.", True),
         get_statement_response_score("2. I feel that I have a number of good qualities.", True),
@@ -24,6 +27,12 @@ def main():
         get_statement_response_score("10. At times I think I am no good at all.", False),
 
     ]
+    #sum up all scores and display total
+    total_score = sum(score_list)
+    print(f"Your score is {total_score}")
+    print("A score below 15 may indicate problematic low self-esteem.")
+
+    
 
 def get_statement_response_score(statement, is_positive):
     """
@@ -46,19 +55,30 @@ def compute_response_point(response, is_positive):
     """
     point = 0
 
-    if (response == 'D'):
-        if (is_positive): point = 0
-        else: point = 3 
-    elif (response == 'd'):
-        if (is_positive): point = 1
-        else: point = 2
-    elif (response == 'a'):
-        if (is_positive): point = 2
-        else: point = 1
-    elif (response == 'D'):
-        if (is_positive): point = 3
-        else: point = 0
-    
+    if (is_positive):
+        if (response == 'D'):
+            point = 0
+        elif (response == 'd'):
+            point = 1
+        elif (response == 'a'):
+            point = 2
+        elif (response == 'A'):
+            point = 3
+        else: 
+            return print(f'{point} is an invalid input')
+
+    elif not(is_positive):
+        if (response == 'D'):
+            point = 3 
+        elif (response == 'd'):
+            point = 2
+        elif (response == 'a'):
+            point = 1
+        elif (response == 'A'):
+            point = 0
+        else: 
+            return print(f'{point} is an invalid input')
+
     return point
 
         
