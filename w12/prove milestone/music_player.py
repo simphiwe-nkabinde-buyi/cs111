@@ -1,3 +1,4 @@
+from os import getcwd
 import tkinter as tk
 from tkinter import filedialog
 from pygame import mixer
@@ -69,28 +70,32 @@ def populate_main_window(frm_main):
     btn_add_songs.grid(row=0, column=13)
 
     listbox_songs.grid(row=1, rowspan=4, column=13)
+    
+    CWD = getcwd() # current working directory
+    MUSIC_FOLDER = "music/"
 
     # music player functions
     def add_songs():
         """add songs to the music player playlist"""
-        #open file
-        temp_song = filedialog.askopenfilenames(initialdir="music/", title="Choose a song", filetypes=(("mp3 Files", "*.mp3"),))
+        #open file/s
+        temp_song = filedialog.askopenfilenames(initialdir=MUSIC_FOLDER, title="Choose a song", filetypes=(("mp3 Files", "*.mp3"),))
         # insert each item into the list
         for song in temp_song:
-            song = song.replace("/home/simphiwe/Desktop/BYU-I/cs111/w12/prove milestone/music/", "")
+            song = song.replace(f"{CWD}/music/", "")
             listbox_songs.insert("end", song)
+
+        lbl_playin_from.config(text=f"playing from {MUSIC_FOLDER}")
 
     def play_song(evt):
         """play selected song"""
         song = listbox_songs.get("active")
-        song_title = trim_song_name(song, 25)
-        song = f"/home/simphiwe/Desktop/BYU-I/cs111/w12/prove milestone/music/{song}"
-        lbl_song.config(text=song_title)
-        mixer.music.load(song)
+        song_path = f"{CWD}/music/{song}"
+        mixer.music.load(song_path)
         mixer.music.play()
         btn_play.grid_remove()
         btn_pause.grid_configure()
-        lbl_playin_from.config(text="playing from music/")
+
+        update_curr_song_name(song)
 
     def pause_song():
         """to pause the song thats currently playing"""
@@ -106,27 +111,31 @@ def populate_main_window(frm_main):
     
     def next_song():
         """play next song on the list"""
-        curr_song_index = listbox_songs.curselection()[0]
-        next_song_index = curr_song_index + 1
+        next_song_index = listbox_songs.curselection()[0] + 1
         next_song = listbox_songs.get(next_song_index)
-        next_song = f"/home/simphiwe/Desktop/BYU-I/cs111/w12/prove milestone/music/{next_song}"
-        mixer.music.load(next_song)
+        next_song_path = f"{CWD}/music/{next_song}"
+        mixer.music.load(next_song_path)
         mixer.music.play()
         listbox_songs.selection_clear(0, "end")
         listbox_songs.activate(next_song_index)
         listbox_songs.select_set(next_song_index)
+        update_curr_song_name(next_song)
 
     def prev_song():
         """play previous song on the list"""
-        curr_song_index = listbox_songs.curselection()[0]
-        prev_song_index = curr_song_index -1
+        prev_song_index = listbox_songs.curselection()[0] - 1
         prev_song = listbox_songs.get(prev_song_index)
-        prev_song = f"/home/simphiwe/Desktop/BYU-I/cs111/w12/prove milestone/music/{prev_song}"
-        mixer.music.load(prev_song)
+        prev_song_path = f"{CWD}/music/{prev_song}"
+        mixer.music.load(prev_song_path)
         mixer.music.play()
         listbox_songs.selection_clear(0, "end")
         listbox_songs.activate(prev_song_index)
         listbox_songs.select_set(prev_song_index)
+        update_curr_song_name(prev_song)
+
+    def update_curr_song_name(name):
+        song_name = trim_song_name(name, 25)
+        lbl_song.config(text=song_name)
 
 
     # bind functions to buttons/widgets
@@ -151,6 +160,7 @@ def trim_song_name(name, max_len):
         song_name = f"{song_name[:max_len]}..."
 
     return song_name
+
 
 
 # If this file is executed like this:
