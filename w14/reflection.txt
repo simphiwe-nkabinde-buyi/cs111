@@ -1,0 +1,28 @@
+Please respond thoroughly (at least two sentences for each question) to
+the following three questions.
+
+1. Describe an experience you had this semester where you saw the power of
+functions.
+When working with functions that make computations using mathematical and scientific 
+formulas. This demonstrated the versitility of functions that take in parameters and return
+values. In lesson 8 we used a lot of functions to compute molecular mass. 
+Each function performed a specific task, making the program modular and versatile.
+
+
+2. In your judgment, what is the value of test functions?
+Test functions allow us to ensure that the functions we have will always produce the 
+correct results. They enable us to recognize and correct potential errors.
+Test funcitons can also help us improve the robustness of our functions.
+
+
+3. Describe your process for troubleshooting and fixing a program that
+has a problem. What is one thing you can do to improve your process?
+- I insert print() functions in key areas of my code to keep track of
+ the values of certain variables and objects that may relate to the error.
+- next I would run the debugger after placing breakpoints in key areas 
+ of my code to track changes that may relate to the error.
+- I can improve my process by using more of the debugging tool instead of placing print
+functions in different areas of my code. The debugging tool is more effective than the
+practice of placing print() functions all over my code.
+
+
