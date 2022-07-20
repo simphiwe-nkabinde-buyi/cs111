@@ -1,9 +1,14 @@
 import tkinter as tk
+from tkinter import filedialog
+from pygame import mixer
 
 def main():
     # create the TK root object
     root = tk.Tk()
     root.geometry("570x525")
+
+    #initialize mixer 
+    mixer.init()
 
     #create the main frame.
     frm_main = tk.Frame(root, bd=0, bg="gray10")
@@ -14,7 +19,6 @@ def main():
 
     root.mainloop()
 
-
 def populate_main_window(frm_main):
     """Populate the main window of this program. In other words, put
     the labels, text entry boxes, and buttons into the main window.
@@ -23,7 +27,6 @@ def populate_main_window(frm_main):
         frm_main: the main frame (window)
     Return: nothing
     """
-
     # images
     global img_headphones
     global img_play_btn
@@ -37,13 +40,13 @@ def populate_main_window(frm_main):
     img_prev_btn = tk.PhotoImage(file="images/prev-button.png", format="png")
 
     # labels
-    lbl_playin_from = tk.Label(frm_main, text="Playing from Playlist", fg="ivory2", bg="gray10")
+    lbl_playin_from = tk.Label(frm_main, text="", fg="ivory2", bg="gray10")
     lbl_headphones = tk.Label(frm_main, image=img_headphones, bg="gray10", width=280, height=280)
     lbl_song = tk.Label(frm_main, text="We are the champions", fg="ivory2", bg="gray10", font="bold")
-    lbl_artist = tk.Label(frm_main, text="Queen", fg="ivory4", bg="gray10")
+    lbl_now_playing = tk.Label(frm_main, text="Now playing", fg="ivory4", bg="gray10")
 
     # list box
-    list_songs = tk.Listbox(frm_main, selectmode="single", bg="gray8", fg="ivory2", bd=0, highlightthickness=0, selectbackground="gray12", width=36, height=28)
+    listbox_songs = tk.Listbox(frm_main, selectmode="single", bg="gray8", fg="ivory2", bd=0, highlightthickness=0, selectbackground="MediumPurple4", selectforeground="ivory2", width=36, height=28)
 
     # buttons
     btn_add_songs = tk.Button(frm_main, cursor="hand2", text="Add Songs", bd=0, fg="ivory3", bg="DarkOrchid4", width=33, highlightthickness=0, activeforeground="ivory4", activebackground="purple4")
@@ -52,23 +55,102 @@ def populate_main_window(frm_main):
     btn_next = tk.Button(frm_main, cursor="hand2", image=img_next_btn, bd=0, bg="gray10", highlightthickness=0, activebackground="gray10")
     btn_prev = tk.Button(frm_main, cursor="hand2", image=img_prev_btn, bd=0, bg="gray10", highlightthickness=0, activebackground="gray10")
 
-
     # grid layout
     lbl_playin_from.grid(row=0, column=1, columnspan=11)
-
     lbl_headphones.grid(row=1, column=0, columnspan=12, pady=20)
-
     lbl_song.grid(row=2, column=0, columnspan=12, pady=5)
-    lbl_artist.grid(row=3, column=0, columnspan=12, pady=0)
+    lbl_now_playing.grid(row=3, column=0, columnspan=12, pady=0)
 
     btn_prev.grid(row=4, column=0, columnspan=3, pady=3)
     btn_play.grid(row=4, column=3, columnspan=6, pady=20)
     btn_pause.grid(row=4, column=3, columnspan=6, pady=20)
+    btn_pause.grid_remove()
     btn_next.grid(row=4, column=9, columnspan=3, pady=3)
-
     btn_add_songs.grid(row=0, column=13)
-    list_songs.grid(row=1, rowspan=4, column=13)
 
+    listbox_songs.grid(row=1, rowspan=4, column=13)
+
+    # music player functions
+    def add_songs():
+        """add songs to the music player playlist"""
+        #open file
+        temp_song = filedialog.askopenfilenames(initialdir="music/", title="Choose a song", filetypes=(("mp3 Files", "*.mp3"),))
+        # insert each item into the list
+        for song in temp_song:
+            song = song.replace("/home/simphiwe/Desktop/BYU-I/cs111/w12/prove milestone/music/", "")
+            listbox_songs.insert("end", song)
+
+    def play_song(evt):
+        """play selected song"""
+        song = listbox_songs.get("active")
+        song_title = trim_song_name(song, 25)
+        song = f"/home/simphiwe/Desktop/BYU-I/cs111/w12/prove milestone/music/{song}"
+        lbl_song.config(text=song_title)
+        mixer.music.load(song)
+        mixer.music.play()
+        btn_play.grid_remove()
+        btn_pause.grid_configure()
+        lbl_playin_from.config(text="playing from music/")
+
+    def pause_song():
+        """to pause the song thats currently playing"""
+        mixer.music.pause()
+        btn_play.grid_configure()
+        btn_pause.grid_remove()
+    
+    def resume_song():
+        """resume the paused song"""
+        mixer.music.unpause()
+        btn_play.grid_remove()
+        btn_pause.grid_configure()
+    
+    def next_song():
+        """play next song on the list"""
+        curr_song_index = listbox_songs.curselection()[0]
+        next_song_index = curr_song_index + 1
+        next_song = listbox_songs.get(next_song_index)
+        next_song = f"/home/simphiwe/Desktop/BYU-I/cs111/w12/prove milestone/music/{next_song}"
+        mixer.music.load(next_song)
+        mixer.music.play()
+        listbox_songs.selection_clear(0, "end")
+        listbox_songs.activate(next_song_index)
+        listbox_songs.select_set(next_song_index)
+
+    def prev_song():
+        """play previous song on the list"""
+        curr_song_index = listbox_songs.curselection()[0]
+        prev_song_index = curr_song_index -1
+        prev_song = listbox_songs.get(prev_song_index)
+        prev_song = f"/home/simphiwe/Desktop/BYU-I/cs111/w12/prove milestone/music/{prev_song}"
+        mixer.music.load(prev_song)
+        mixer.music.play()
+        listbox_songs.selection_clear(0, "end")
+        listbox_songs.activate(prev_song_index)
+        listbox_songs.select_set(prev_song_index)
+
+
+    # bind functions to buttons/widgets
+    btn_add_songs.config(command=add_songs)
+    listbox_songs.bind("<<ListboxSelect>>", play_song)
+    btn_pause.config(command=pause_song)
+    btn_play.config(command=resume_song)
+    btn_prev.config(command=prev_song)
+    btn_next.config(command=next_song)
+
+def trim_song_name(name, max_len):
+    """trim the length of the song name to a specified length
+    Parameters:
+        name: string - name of the song
+        max_len: number - the maximum length of the final string
+    Return: string - trimmed song name"""
+
+    # remove the .mp3 extention
+    song_name = name.replace(".mp3", "")
+    
+    if len(song_name) > max_len:
+        song_name = f"{song_name[:max_len]}..."
+
+    return song_name
 
 
 # If this file is executed like this:
